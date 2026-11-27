@@ -10,6 +10,9 @@
      label-primary-foreground, which flips the same way (white in light,
      near-black in dark). A hardcoded white label is invisible in dark mode. */
   --aurora-on-accent: var(--dsw-alias-label-primary-foreground, #ffffff);
+  /* Paired hover fill; the host keeps the same label on hover, so this
+     is the only thing that changes. */
+  --aurora-accent-hover: var(--dsw-alias-button-primary-hover, #43454a);
   /* Text that sits on a saturated colour (error/warn/success fills). */
   --aurora-on-color: var(--dsw-alias-label-on-color, #ffffff);
   /* No host danger pair exists. The error hue is a mid red in both themes,
@@ -141,11 +144,15 @@
   font-weight: 500;
   transition: background 0.15s, transform 0.05s;
 }
-.aurora-panel .button:hover{ background: var(--aurora-surface-2); }
+.aurora-panel .button:hover:not(.button-primary):not(.button-danger){ background: var(--aurora-surface-2); }
+/* The generic hover above must not repaint filled buttons: the primary
+   label is an inverse colour, so surface-2 under it is unreadable. */
 .aurora-panel .button:active{ transform: translateY(1px); }
 .aurora-panel .button-primary{ background: var(--aurora-accent); border-color: var(--aurora-accent); color: var(--aurora-on-accent); }
+.aurora-panel .button-primary:hover:not(:disabled){ background: var(--aurora-accent-hover); border-color: var(--aurora-accent-hover); }
 .aurora-panel .button-primary:disabled{ opacity: 0.5; cursor: not-allowed; }
 .aurora-panel .button-danger{ background: var(--aurora-error); border-color: var(--aurora-error); color: var(--aurora-on-danger); }
+.aurora-panel .button-danger:hover:not(:disabled){ background: color-mix(in srgb, var(--aurora-error) 88%, var(--aurora-text)); border-color: color-mix(in srgb, var(--aurora-error) 88%, var(--aurora-text)); }
 .aurora-panel .button-danger-text{ color: var(--aurora-error); }
 .aurora-panel .button-ghost{ background: transparent; }
 .aurora-panel .button-small{ padding: 5px 10px; font-size: 12px; }
