@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "Aurora 工作台",
+    "description": "在左侧栏添加「Aurora 工作台」入口。打开后可在一个本地优先的面板中管理选题池、内容生产、发布日历、数据效果与素材脚本；数据保存在当前浏览器中。",
+    "detail": "docs/DETAIL.zh.md"
+  }
+}

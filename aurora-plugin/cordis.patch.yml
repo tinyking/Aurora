@@ -1,0 +1,3 @@
+- insert:
+    - id: aurora-workbench
+      name: '@local/aurora-workbench'

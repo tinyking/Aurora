@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "Aurora workbench",
+    "description": "Adds an Aurora entry to the left sidebar. Open it to manage topics, content production, publishing calendar, performance metrics, and creative assets in one local-first panel; data is stored in this browser.",
+    "detail": "docs/DETAIL.md"
+  }
+}
