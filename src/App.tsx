@@ -20,11 +20,10 @@ const NAV: { key: PageKey; label: string; icon: string }[] = [
   { key: 'settings', label: '设置', icon: '⚙' },
 ]
 
-export default function App() {
+export default function AuroraPanel() {
   const data = useWorkbench()
   const [page, setPage] = useState<PageKey>('dashboard')
   const [search, setSearch] = useState('')
-  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const results = useMemo(() => {
     const needle = search.trim().toLowerCase()
@@ -39,7 +38,6 @@ export default function App() {
   const navigate = (target: PageKey) => {
     setPage(target)
     setSearch('')
-    setSidebarOpen(false)
   }
 
   const today = new Date()
@@ -51,74 +49,68 @@ export default function App() {
   const recentMetrics = [...data.metrics].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5)
 
   return (
-    <div className="app-shell">
-      <aside className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
-        <div className="brand">
-          <div className="brand-logo">✦</div>
-          <div>
-            <strong>Aurora</strong>
-            <span className="brand-sub">个人自媒体工作台</span>
-          </div>
-        </div>
-        <nav className="nav">
-          {NAV.map((item) => (
-            <button
-              key={item.key}
-              className={`nav-item ${page === item.key ? 'nav-item-active' : ''}`}
-              onClick={() => navigate(item.key)}
-            >
-              <span className="nav-icon">{item.icon}</span>
-              {item.label}
-            </button>
-          ))}
-        </nav>
-        <div className="sidebar-footer">本地优先 · 数据存在浏览器</div>
-      </aside>
-
-      <div className="main-area">
-        <header className="topbar">
-          <button className="icon-button mobile-menu" onClick={() => setSidebarOpen(!sidebarOpen)} aria-label="菜单">☰</button>
-          <div className="search-wrap">
-            <input
-              className="input search-input"
-              placeholder="搜索选题、内容、素材…"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-            />
-            {results.length > 0 && (
-              <div className="search-results">
-                {results.map((result) => (
-                  <button key={`${result.kind}-${result.id}`} onClick={() => navigate(result.target)}>
-                    <span className="tag">{result.kind}</span>
-                    {result.title}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-          <span className="topbar-date">{today.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-        </header>
-
-        <main className="content">
-          {!data.ready ? (
-            <div className="loading">加载中…</div>
-          ) : page === 'dashboard' ? (
-            <Dashboard data={data} upcoming={upcoming} recentMetrics={recentMetrics} onNavigate={navigate} />
-          ) : page === 'topics' ? (
-            <Topics data={data} />
-          ) : page === 'content' ? (
-            <ContentBoard data={data} />
-          ) : page === 'calendar' ? (
-            <CalendarPage data={data} />
-          ) : page === 'metrics' ? (
-            <MetricsPage data={data} />
-          ) : page === 'assets' ? (
-            <AssetsPage data={data} />
-          ) : (
-            <SettingsPage data={data} />
+    <div className="aurora-panel">
+      <header className="aurora-topbar">
+        <div className="aurora-search-wrap">
+          <input
+            className="input aurora-search-input"
+            placeholder="搜索选题、内容、素材…"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+          {results.length > 0 && (
+            <div className="aurora-search-results">
+              {results.map((result) => (
+                <button key={`${result.kind}-${result.id}`} onClick={() => navigate(result.target)}>
+                  <span className="tag">{result.kind}</span>
+                  {result.title}
+                </button>
+              ))}
+            </div>
           )}
-        </main>
-      </div>
+        </div>
+        <span className="aurora-date">{today.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+      </header>
+
+      <nav className="aurora-nav" aria-label="Aurora 功能导航">
+        {NAV.map((item) => (
+          <button
+            key={item.key}
+            className={`aurora-nav-item ${page === item.key ? 'aurora-nav-active' : ''}`}
+            onClick={() => navigate(item.key)}
+          >
+            <span className="aurora-nav-icon">{item.icon}</span>
+            {item.label}
+          </button>
+        ))}
+      </nav>
+
+      {data.error && (
+        <div className="notice aurora-error" role="alert">
+          <span>数据读写失败：{data.error}。数据仍保留在本机，可重试。</span>
+          <button className="button button-small" onClick={() => void data.reload()}>重试</button>
+        </div>
+      )}
+
+      <main className="aurora-content">
+        {!data.ready ? (
+          <div className="aurora-loading">加载中…</div>
+        ) : page === 'dashboard' ? (
+          <Dashboard data={data} upcoming={upcoming} recentMetrics={recentMetrics} onNavigate={navigate} />
+        ) : page === 'topics' ? (
+          <Topics data={data} />
+        ) : page === 'content' ? (
+          <ContentBoard data={data} />
+        ) : page === 'calendar' ? (
+          <CalendarPage data={data} />
+        ) : page === 'metrics' ? (
+          <MetricsPage data={data} />
+        ) : page === 'assets' ? (
+          <AssetsPage data={data} />
+        ) : (
+          <SettingsPage data={data} />
+        )}
+      </main>
     </div>
   )
 }

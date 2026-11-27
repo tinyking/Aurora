@@ -33,6 +33,11 @@ function getDB() {
         db.createObjectStore('assets', { keyPath: 'id' })
         db.createObjectStore('preferences', { keyPath: 'key' })
       },
+    }).catch((error: unknown) => {
+      // A rejected open (private mode, blocked storage) must not be cached,
+      // or every later read keeps failing with no way to retry.
+      dbPromise = null
+      throw error
     })
   }
   return dbPromise

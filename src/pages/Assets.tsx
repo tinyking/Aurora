@@ -119,7 +119,7 @@ export function AssetsPage({ data }: { data: Workbench }) {
 }
 
 function downloadAsset(asset: Asset) {
-  if (!asset.fileBlob || !asset.fileName) return
+  if (!(asset.fileBlob instanceof Blob) || !asset.fileName) return
   const url = URL.createObjectURL(asset.fileBlob)
   const anchor = document.createElement('a')
   anchor.href = url

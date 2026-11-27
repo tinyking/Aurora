@@ -6,7 +6,7 @@ const here = dirname(fileURLToPath(import.meta.url))
 const at = (p) => resolve(here, p)
 
 const app = readFileSync(at('dist/app.js'), 'utf8')
-let css = readFileSync(at('build/styles.css'), 'utf8')
+let css = readFileSync(at('src/styles.css'), 'utf8')
 
 // --- CSS guards -------------------------------------------------------------
 // Collapse accidental double prefixes until stable.
@@ -14,7 +14,7 @@ const cssBefore = css
 while (css.includes('.aurora-panel .aurora-panel')) {
   css = css.replaceAll('.aurora-panel .aurora-panel', '.aurora-panel')
 }
-if (css !== cssBefore) writeFileSync(at('build/styles.css'), css)
+if (css !== cssBefore) writeFileSync(at('src/styles.css'), css)
 if (/\.aurora-panel\s*\.aurora-panel/.test(css)) {
   throw new Error('CSS still contains a double .aurora-panel prefix')
 }

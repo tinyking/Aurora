@@ -1,17 +1,6 @@
 import { useMemo, useState } from 'react'
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Legend,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts'
 import { ConfirmDialog, Field } from '../components/Fields'
+import { GroupedBarChart, TrendChart } from '../components/Charts'
 import { Modal } from '../components/Modal'
 import { uid } from '../db'
 import type { Workbench } from '../hooks'
@@ -106,31 +95,25 @@ export function MetricsPage({ data }: { data: Workbench }) {
           <div className="chart-grid">
             <section className="card chart-card">
               <h2>播放与互动趋势（最近 30 个记录日）</h2>
-              <ResponsiveContainer width="100%" height={260}>
-                <AreaChart data={trendData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-                  <YAxis tick={{ fontSize: 11 }} />
-                  <Tooltip />
-                  <Legend />
-                  <Area type="monotone" dataKey="views" name="播放/阅读" stroke="#2563eb" fill="#93c5fd" />
-                  <Area type="monotone" dataKey="interactions" name="互动" stroke="#7c3aed" fill="#c4b5fd" />
-                  <Area type="monotone" dataKey="followers" name="涨粉" stroke="#059669" fill="#6ee7b7" />
-                </AreaChart>
-              </ResponsiveContainer>
+              <TrendChart
+                data={trendData}
+                series={[
+                  { key: 'views', name: '播放/阅读', color: '#2563eb' },
+                  { key: 'interactions', name: '互动', color: '#7c3aed' },
+                  { key: 'followers', name: '涨粉', color: '#059669' },
+                ]}
+              />
             </section>
             <section className="card chart-card">
               <h2>平台播放量对比</h2>
-              <ResponsiveContainer width="100%" height={260}>
-                <BarChart data={platformData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="platform" tick={{ fontSize: 11 }} />
-                  <YAxis tick={{ fontSize: 11 }} />
-                  <Tooltip />
-                  <Bar dataKey="views" name="播放/阅读" fill="#2563eb" />
-                  <Bar dataKey="likes" name="点赞" fill="#f472b6" />
-                </BarChart>
-              </ResponsiveContainer>
+              <GroupedBarChart
+                data={platformData}
+                labelKey="platform"
+                series={[
+                  { key: 'views', name: '播放/阅读', color: '#2563eb' },
+                  { key: 'likes', name: '点赞', color: '#f472b6' },
+                ]}
+              />
             </section>
           </div>
 
