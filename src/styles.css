@@ -5,6 +5,16 @@
    fallbacks for when the token is undefined. */
 .aurora-panel{
   --aurora-accent: var(--dsw-alias-brand-primary, #4f46e5);
+  /* brand-primary is an INVERSE colour: near-black in light, near-white in
+     dark. The host pairs its own primary button fill with
+     label-primary-foreground, which flips the same way (white in light,
+     near-black in dark). A hardcoded white label is invisible in dark mode. */
+  --aurora-on-accent: var(--dsw-alias-label-primary-foreground, #ffffff);
+  /* Text that sits on a saturated colour (error/warn/success fills). */
+  --aurora-on-color: var(--dsw-alias-label-on-color, #ffffff);
+  /* No host danger pair exists. The error hue is a mid red in both themes,
+     so the label flips with the theme instead of assuming white on red. */
+  --aurora-on-danger: var(--dsw-alias-label-primary-foreground, #ffffff);
   --aurora-bg: var(--dsw-alias-bg-base, #f5f7fb);
   --aurora-surface: var(--dsw-alias-bg-layer-1, #ffffff);
   --aurora-surface-2: var(--dsw-alias-bg-layer-2, #eef2f7);
@@ -14,8 +24,8 @@
   --aurora-error: var(--dsw-alias-state-error-primary, #dc2626);
   --aurora-success: var(--dsw-alias-state-success-primary, #15803d);
   --aurora-warn: var(--dsw-alias-state-warn-primary, #b45309);
-  --aurora-info: var(--dsw-alias-brand-primary, #1d4ed8);
-  --aurora-violet: #7c3aed;
+  --aurora-info: var(--dsw-alias-state-business-primary, #2563eb);
+  --aurora-violet: #8b5cf6;
   --aurora-pink: #f472b6;
   --aurora-radius: 12px;
   --aurora-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
@@ -133,9 +143,9 @@
 }
 .aurora-panel .button:hover{ background: var(--aurora-surface-2); }
 .aurora-panel .button:active{ transform: translateY(1px); }
-.aurora-panel .button-primary{ background: var(--aurora-accent); border-color: var(--aurora-accent); color: #fff; }
+.aurora-panel .button-primary{ background: var(--aurora-accent); border-color: var(--aurora-accent); color: var(--aurora-on-accent); }
 .aurora-panel .button-primary:disabled{ opacity: 0.5; cursor: not-allowed; }
-.aurora-panel .button-danger{ background: var(--aurora-error); border-color: var(--aurora-error); color: #fff; }
+.aurora-panel .button-danger{ background: var(--aurora-error); border-color: var(--aurora-error); color: var(--aurora-on-danger); }
 .aurora-panel .button-danger-text{ color: var(--aurora-error); }
 .aurora-panel .button-ghost{ background: transparent; }
 .aurora-panel .button-small{ padding: 5px 10px; font-size: 12px; }
