@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 
 export function Field({ label, children, hint }: { label: string; children: ReactNode; hint?: string }) {
   return (
@@ -60,16 +61,19 @@ export function ConfirmDialog({
   onConfirm: () => void
   onCancel: () => void
 }) {
-  return (
-    <div className="modal-backdrop" onMouseDown={onCancel}>
-      <div className="modal confirm-modal" role="alertdialog" onMouseDown={(event) => event.stopPropagation()}>
-        <h2>请确认</h2>
-        <p>{message}</p>
-        <div className="form-actions">
-          <button className="button button-ghost" onClick={onCancel}>取消</button>
-          <button className="button button-danger" onClick={onConfirm}>确认删除</button>
+  return createPortal(
+    <div className="aurora-panel aurora-portal">
+      <div className="modal-backdrop" onMouseDown={onCancel}>
+        <div className="modal confirm-modal" role="alertdialog" onMouseDown={(event) => event.stopPropagation()}>
+          <h2>请确认</h2>
+          <p>{message}</p>
+          <div className="form-actions">
+            <button className="button button-ghost" onClick={onCancel}>取消</button>
+            <button className="button button-danger" onClick={onConfirm}>确认删除</button>
+          </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

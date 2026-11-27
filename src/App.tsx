@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useWorkbench } from './hooks'
 import { AssetsPage } from './pages/Assets'
 import { CalendarPage } from './pages/Calendar'
@@ -20,10 +20,37 @@ const NAV: { key: PageKey; label: string; icon: string }[] = [
   { key: 'settings', label: '设置', icon: '⚙' },
 ]
 
+/** Panel-width breakpoints, applied as an attribute on the panel root.
+ *
+ * The panel must not be a CSS container: declaring `container-type` makes it
+ * the containing block for `position: fixed` descendants, which is exactly
+ * what trapped the dialogs inside the scrolling panel. Observing the width and
+ * writing an attribute keeps the responsive layout without that side effect.
+ */
+function usePanelWidth(root: React.RefObject<HTMLDivElement | null>) {
+  useEffect(() => {
+    const element = root.current
+    if (!element) return
+    const apply = (width: number) => {
+      element.dataset.auroraWidth = width < 760 ? 'narrow' : width < 1100 ? 'compact' : ''
+    }
+    apply(element.clientWidth)
+    if (typeof ResizeObserver === 'undefined') return
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0]
+      if (entry) apply(entry.contentRect.width)
+    })
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [root])
+}
+
 export default function AuroraPanel() {
   const data = useWorkbench()
   const [page, setPage] = useState<PageKey>('dashboard')
   const [search, setSearch] = useState('')
+  const rootRef = useRef<HTMLDivElement>(null)
+  usePanelWidth(rootRef)
 
   const results = useMemo(() => {
     const needle = search.trim().toLowerCase()
@@ -49,7 +76,7 @@ export default function AuroraPanel() {
   const recentMetrics = [...data.metrics].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5)
 
   return (
-    <div className="aurora-panel">
+    <div className="aurora-panel aurora-root" ref={rootRef}>
       <header className="aurora-topbar">
         <div className="aurora-search-wrap">
           <input

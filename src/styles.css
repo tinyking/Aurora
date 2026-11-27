@@ -1,3 +1,8 @@
+/* Theme variables are shared by the panel and by portalled dialogs, which
+   carry the `.aurora-panel` scope but must not inherit the panel's layout.
+   Every colour resolves through a host `--dsw-alias-*` token, which the host
+   re-defines under body[data-ds-dark-theme]; the trailing literals are only
+   fallbacks for when the token is undefined. */
 .aurora-panel{
   --aurora-accent: var(--dsw-alias-brand-primary, #4f46e5);
   --aurora-bg: var(--dsw-alias-bg-base, #f5f7fb);
@@ -8,20 +13,28 @@
   --aurora-muted: var(--dsw-alias-label-secondary, #64748b);
   --aurora-error: var(--dsw-alias-state-error-primary, #dc2626);
   --aurora-success: var(--dsw-alias-state-success-primary, #15803d);
+  --aurora-warn: var(--dsw-alias-state-warn-primary, #b45309);
+  --aurora-info: var(--dsw-alias-brand-primary, #1d4ed8);
+  --aurora-violet: #7c3aed;
+  --aurora-pink: #f472b6;
   --aurora-radius: 12px;
   --aurora-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
   box-sizing: border-box;
-  min-height: 100%;
-  padding: 24px 32px;
-  background: var(--aurora-bg);
-  color: var(--aurora-text);
   font-family: inherit;
   font-size: 14px;
-  overflow: auto;
+  color: var(--aurora-text);
 }
 .aurora-panel *, .aurora-panel *::before, .aurora-panel *::after{ box-sizing: border-box; }
 .aurora-panel button, .aurora-panel input, .aurora-panel select, .aurora-panel textarea{ font: inherit; color: inherit; }
 .aurora-panel button{ cursor: pointer; }
+
+/* The real panel: the one element that scrolls and paints the page background. */
+.aurora-panel.aurora-root{ min-height: 100%; padding: 24px 32px; background: var(--aurora-bg); overflow: auto; }
+
+/* Portalled dialogs live in document.body. They only need the variables and the
+   scoped selectors; the panel's padding/background/overflow would turn the whole
+   backdrop into an opaque page, which is what produced the white slab. */
+.aurora-panel.aurora-portal{ padding: 0; background: none; }
 
 .aurora-panel .aurora-topbar{
   display: flex;
@@ -164,14 +177,17 @@
 .aurora-panel .modal-backdrop{
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.5);
+  background: color-mix(in srgb, var(--aurora-text) 42%, transparent);
+  backdrop-filter: blur(2px);
   display: grid;
   place-items: center;
   z-index: 100;
   padding: 20px;
 }
 .aurora-panel .modal{
-  background: var(--aurora-surface);
+  background: var(--dsw-alias-bg-overlay, var(--aurora-surface));
+  color: var(--aurora-text);
+  border: 1px solid var(--dsw-alias-border-l2, var(--aurora-border));
   border-radius: 16px;
   width: min(560px, 100%);
   max-height: 90vh;
@@ -193,8 +209,8 @@
 .aurora-panel .tag-row{ display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
 .aurora-panel .tag{ display: inline-block; background: var(--aurora-surface-2); border-radius: 6px; padding: 2px 8px; font-size: 11px; }
 .aurora-panel .badge{ display: inline-flex; align-items: center; border-radius: 999px; padding: 3px 10px; font-size: 11px; font-weight: 600; background: var(--aurora-surface-2); }
-.aurora-panel .badge-idea{ background: rgba(245, 158, 11, 0.16); color: #b45309; }
-.aurora-panel .badge-active{ background: rgba(59, 130, 246, 0.16); color: #1d4ed8; }
+.aurora-panel .badge-idea{ background: rgba(245, 158, 11, 0.16); color: var(--aurora-warn); }
+.aurora-panel .badge-active{ background: rgba(59, 130, 246, 0.16); color: var(--aurora-info); }
 .aurora-panel .badge-published{ background: rgba(34, 197, 94, 0.16); color: var(--aurora-success); }
 .aurora-panel .badge-dropped{ color: var(--aurora-muted); }
 
@@ -289,24 +305,27 @@
 .aurora-panel .mini-dot-blue{ background: var(--aurora-accent); }
 .aurora-panel .mini-title{ flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-@container (max-width: 1100px) {
-  .aurora-panel .board{ grid-template-columns: repeat(2, 1fr); }
-  .aurora-panel .chart-grid, .aurora-panel .dashboard-grid{ grid-template-columns: 1fr; }
+/* Responsive breakpoints. The panel is not a CSS container (a container would
+   become the containing block of fixed descendants), so the panel root sets
+   data-aurora-width="compact" (<1100px) or "narrow" (<760px) from a
+   ResizeObserver and the rules key off that attribute instead. */
+.aurora-panel.aurora-root[data-aurora-width="compact"] .board,
+.aurora-panel.aurora-root[data-aurora-width="narrow"] .board{ grid-template-columns: repeat(2, 1fr); }
+.aurora-panel.aurora-root[data-aurora-width="compact"] .chart-grid,
+.aurora-panel.aurora-root[data-aurora-width="narrow"] .chart-grid,
+.aurora-panel.aurora-root[data-aurora-width="compact"] .dashboard-grid,
+.aurora-panel.aurora-root[data-aurora-width="narrow"] .dashboard-grid{ grid-template-columns: 1fr; }
+.aurora-panel.aurora-root[data-aurora-width="narrow"]{ padding: 16px; }
+.aurora-panel.aurora-root[data-aurora-width="narrow"] .board{ grid-template-columns: 1fr; }
+.aurora-panel.aurora-root[data-aurora-width="narrow"] .aurora-date{ display: none; }
+/* The dialog follows the viewport, not the panel width. */
+@media (max-width: 760px){
+  .aurora-panel.aurora-portal .form-row, .aurora-panel.aurora-portal .number-grid{ grid-template-columns: 1fr; }
 }
-@container (max-width: 760px) {
-  .aurora-panel .board{ grid-template-columns: 1fr; }
-}
-@media (max-width: 760px) {
-  .aurora-panel{ padding: 16px; }
-  .aurora-panel .board{ grid-template-columns: 1fr; }
-  .aurora-panel .form-row, .aurora-panel .number-grid{ grid-template-columns: 1fr 1fr; }
-  .aurora-panel .aurora-date{ display: none; }
-}
-.aurora-panel{ container-type: inline-size; }
 
-.aurora-panel .badge-asset-script{ background: rgba(168, 85, 247, 0.16); color: #7c3aed; }
-.aurora-panel .badge-asset-link{ background: rgba(37, 99, 235, 0.16); color: #1d4ed8; }
-.aurora-panel .badge-asset-note{ background: rgba(245, 158, 11, 0.16); color: #b45309; }
+.aurora-panel .badge-asset-script{ background: rgba(168, 85, 247, 0.16); color: var(--aurora-violet); }
+.aurora-panel .badge-asset-link{ background: rgba(37, 99, 235, 0.16); color: var(--aurora-info); }
+.aurora-panel .badge-asset-note{ background: rgba(245, 158, 11, 0.16); color: var(--aurora-warn); }
 .aurora-panel .badge-asset-file{ background: rgba(34, 197, 94, 0.16); color: var(--aurora-success); }
 .aurora-panel .aurora-chart{ display: flex; flex-direction: column; gap: 8px; }
 .aurora-panel .aurora-chart svg{ display: block; width: 100%; height: auto; }
